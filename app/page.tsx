@@ -1,22 +1,31 @@
-"use client";
+'use client';
 
-import { SetStateAction, useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation'; // Next.js 13+ App Router
-import { getExample } from '../services/api';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 
 export default function Home() {
-  const [message, setMessage] = useState('');
-  const router = useRouter(); // เรียก useRouter
+  const router = useRouter();
+  const { data: session, status } = useSession(); // ดึง session
+  const [username, setUsername] = useState('');
 
+  // ดึง username จาก session
   useEffect(() => {
-    getExample()
-      .then((data: { message: SetStateAction<string>; }) => setMessage(data.message))
-      .catch((err: any) => console.error(err));
-  }, []);
+    if (status === 'authenticated' && session?.user?.username) {
+      setUsername(session.user.username);
+    }
+  }, [session, status]);
+
+  // ถ้าไม่ได้ login redirect ไปหน้า login
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      router.push('/login');
+    }
+  }, [status, router]);
 
   return (
     <div style={{ textAlign: 'center', marginTop: '50px' }}>
-      <h1>{'Hello'}</h1>
+      <h1>Hello, {username || 'Guest'}</h1>
 
       <button
         style={{
@@ -24,11 +33,28 @@ export default function Home() {
           padding: '10px 20px',
           fontSize: '16px',
           cursor: 'pointer',
-          backgroundColor: '#18ff18ff', color: 'white', width: '200px'
+          backgroundColor: '#18ff18ff',
+          color: 'white',
+          width: '200px',
         }}
-        onClick={() => router.push('/messages')} // เมื่อคลิกไปหน้า /home
+        onClick={() => router.push('/messages')}
       >
         ไปหน้า Messages
+      </button>
+      
+      <button
+        style={{
+          marginTop: '20px',
+          padding: '10px 20px',
+          fontSize: '16px',
+          cursor: 'pointer',
+          backgroundColor: '#18ff18ff',
+          color: 'white',
+          width: '200px',
+        }}
+        onClick={() => router.push('/user')}
+      >
+        ไปหน้า User
       </button>
     </div>
   );

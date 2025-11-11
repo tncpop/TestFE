@@ -11,10 +11,6 @@ export const getExample = async () => {
   const res = await api.get('/example');
   return res.data;
 };
-export const getExample2 = async () => {
-  const res = await api.get('/example/2');
-  return res.data;
-};
 export const sendMessage = async (message: string) => {
   const res = await api.post('/example', { message });
   return res.data;
