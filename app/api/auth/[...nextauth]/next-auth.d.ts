@@ -7,6 +7,7 @@ declare module "next-auth" {
     user: {
       id: number;
       username: string;
+      role?: string; // ✅ เพิ่ม role
     } & DefaultSession["user"];
     accessToken?: string;
   }
@@ -14,6 +15,7 @@ declare module "next-auth" {
   interface User {
     id: number;
     username: string;
-    access_token?: string;
+    role?: string;        // ✅ เพิ่ม role
+    accessToken?: string; // ✅ ต้องตรงกับชื่อใน route.ts
   }
 }

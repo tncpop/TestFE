@@ -4,16 +4,18 @@ const API_URL = 'http://localhost:3001/user'; // BE URL
 
 export const getUsers = async () => {
   const res = await axios.get(API_URL);
-  return res.data; // [{ id, username }, ...]
+  return res.data; // [{ id, username, role }, ...]
 };
 
-export const createUser = async (username: string, password: string) => {
-  const res = await axios.post(`${API_URL}/register`, { username, password });
+// เพิ่ม role ตอนสร้าง user
+export const createUser = async (username: string, password: string, role: string) => {
+  const res = await axios.post(`${API_URL}/register`, { username, password, role });
   return res.data;
 };
 
-export const updateUser = async (id: number, username: string, password?: string) => {
-  const res = await axios.put(`${API_URL}/${id}`, { username, password });
+// เพิ่ม role ตอนแก้ไข user
+export const updateUser = async (id: number, username: string, password?: string, role?: string) => {
+  const res = await axios.put(`${API_URL}/${id}`, { username, password, role });
   return res.data;
 };
 

@@ -41,7 +41,7 @@ export default function Home() {
       >
         ไปหน้า Messages
       </button>
-      
+      <span> </span>
       <button
         style={{
           marginTop: '20px',
