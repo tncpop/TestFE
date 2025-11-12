@@ -47,6 +47,7 @@ function LayoutContent({ children }: LayoutProps) {
               {isAdmin && <Link href="/user" style={{ color: '#5c4033', textDecoration: 'none', fontWeight: 500 }}>จัดการผู้ใช้งานในระบบ</Link>}
               {isAdmin && <Link href="/customer" style={{ color: '#5c4033', textDecoration: 'none', fontWeight: 500 }}>จัดการลูกค้า</Link>}
               {isAdmin && <Link href="/product" style={{ color: '#5c4033', textDecoration: 'none', fontWeight: 500 }}>จัดการสินค้า</Link>}
+              {isAdmin && <Link href="/receipt" style={{ color: '#5c4033', textDecoration: 'none', fontWeight: 500 }}>ประวัติการขาย</Link>}
             </nav>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>

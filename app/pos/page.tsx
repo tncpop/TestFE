@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { getProducts } from '@/services/api/product';
+import { createReceipt } from '@/services/api/receipt';
 
 interface Product {
   id: number;
@@ -118,7 +119,7 @@ export default function POSPage() {
   };
 
   const cancelBtnStyle = {
-     padding: '10px 20px',
+    padding: '10px 20px',
     marginBottom: '10px',
     width: '100%',
     borderRadius: '8px',
@@ -248,7 +249,7 @@ export default function POSPage() {
           backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000
         }}>
           <div style={{ backgroundColor: '#fffaf6', padding: '20px', borderRadius: '12px', width: '320px', textAlign: 'center' }}>
-            
+
             {/* เลือกวิธีชำระเงิน */}
             {!paymentMethod && (
               <>
@@ -306,14 +307,46 @@ export default function POSPage() {
                   </>
                 )}
                 {paymentMethod === 'qr' && <p>ชำระผ่าน QR เรียบร้อย</p>}
-                <button onClick={() => {
-                  setCart([]);
-                  setShowPaymentPopup(false);
-                  setPaymentMethod(null);
-                  setShowReceipt(false);
-                  setCashReceived(0);
-                  setChange(0);
-                }} style={btnStyle}>
+
+                {/* ปุ่มเสร็จสิ้นพร้อม log ข้อมูล */}
+                <button
+                  onClick={async () => {
+                    // สร้าง payload ให้ตรงกับ BE
+                    const payload = {
+                      username,
+                      total_price: totalPrice,
+                      payment_method: paymentMethod,
+                      cash_received: paymentMethod === 'cash' ? cashReceived : null,
+                      change: paymentMethod === 'cash' ? change : null,
+                      items: cart.map(item => ({
+                        product_id: item.id,
+                        name: item.name,
+                        price: item.price,
+                        quantity: item.quantity,
+                        type: item.type,
+                      })),
+                    };
+
+                    console.log('--- Sale Completed ---');
+                    console.log(payload);
+
+                    try {
+                      await createReceipt(payload);
+                      console.log('Receipt created successfully');
+                    } catch (err) {
+                      console.error('Failed to create receipt', err);
+                    }
+
+                    // รีเซ็ต state
+                    setCart([]);
+                    setShowPaymentPopup(false);
+                    setPaymentMethod(null);
+                    setShowReceipt(false);
+                    setCashReceived(0);
+                    setChange(0);
+                  }}
+                  style={btnStyle}
+                >
                   เสร็จสิ้น
                 </button>
               </>
