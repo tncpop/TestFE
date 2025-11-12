@@ -1,8 +1,7 @@
 'use client';
-
 import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
-import { useRouter } from 'next/navigation'; // App Router
+import { useRouter } from 'next/navigation';
 import { createUser, deleteUser, getUsers, updateUser } from '@/services/api/user';
 import { FaEdit, FaTrash, FaCheck, FaTimes } from 'react-icons/fa';
 
@@ -36,23 +35,19 @@ export default function UsersPage() {
 
   // ตรวจสอบสิทธิ์ admin
   useEffect(() => {
-    if (session === undefined) return; // รอโหลด session
+    if (session === undefined) return;
     if (session && session.user.role !== 'admin') {
-      setAccessDenied(true); // แสดงข้อความว่าไม่มีสิทธิ์
-       setTimeout(() => {
-      router.push('/'); // redirect non-admins หลัง 4 วินาที
-    }, 3000); // 
+      setAccessDenied(true);
+      setTimeout(() => router.push('/'), 3000);
     }
   }, [session, router]);
 
-  // Fetch users สำหรับ admin เท่านั้น
   useEffect(() => {
     if (session && session.user.role === 'admin') {
       fetchUsers();
     }
   }, [session]);
 
-  // Add new user
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newUsername || !newPassword) {
@@ -67,11 +62,10 @@ export default function UsersPage() {
       setError('');
       fetchUsers();
     } catch (err: any) {
-      setError(err.message || 'Error');
+      setError(err.message || 'เกิดข้อผิดพลาด');
     }
   };
 
-  // Edit user
   const handleEdit = (user: User) => {
     setEditingId(user.id);
     setEditUsername(user.username);
@@ -97,7 +91,7 @@ export default function UsersPage() {
       handleCancel();
       fetchUsers();
     } catch (err: any) {
-      setError(err.message || 'Error');
+      setError(err.message || 'เกิดข้อผิดพลาด');
     }
   };
 
@@ -107,50 +101,92 @@ export default function UsersPage() {
       await deleteUser(id);
       fetchUsers();
     } catch (err: any) {
-      setError(err.message || 'Error');
+      setError(err.message || 'เกิดข้อผิดพลาด');
     }
   };
 
   if (session === undefined) return <p>Loading...</p>;
-  if (accessDenied) return <p style={{ color: 'red', textAlign: 'center' }}>คุณไม่มีสิทธิ์เข้าถึงหน้านี้</p>;
+  if (accessDenied) return <p style={{ color: '#e74c3c', textAlign: 'center' }}>คุณไม่มีสิทธิ์เข้าถึงหน้านี้</p>;
 
   return (
-    <div style={{ maxWidth: '900px', margin: '50px auto', padding: '20px', fontFamily: 'Arial, sans-serif', backgroundColor: '#f9f9f9', borderRadius: '10px', boxShadow: '0 0 10px rgba(0,0,0,0.1)' }}>
-      <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>User Management</h2>
-      {error && <p style={{ color: 'red', textAlign: 'center' }}>{error}</p>}
+    <div style={{
+      padding: '30px',
+      fontFamily: 'Prompt, sans-serif',
+      backgroundColor: '#fffaf6',
+      minHeight: '100vh',
+    }}>
+      <h2 style={{ fontSize: '1.8rem', fontWeight: 700, color: '#c77b30', marginBottom: '20px', textAlign: 'left' }}>จัดการผู้ใช้งาน</h2>
 
-      <form onSubmit={handleAdd} style={{ display: 'flex', justifyContent: 'center', marginBottom: '30px', gap: '10px' }}>
-        <input placeholder="Username" value={newUsername} onChange={e => setNewUsername(e.target.value)} style={{ padding: '8px 12px', borderRadius: '5px', border: '1px solid #ccc', flex: '1' }} />
-        <input placeholder="Password" type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} style={{ padding: '8px 12px', borderRadius: '5px', border: '1px solid #ccc', flex: '1' }} />
-        <select value={newRole} onChange={e => setNewRole(e.target.value as 'admin' | 'user')} style={{ padding: '8px', borderRadius: '5px', border: '1px solid #ccc' }}>
+      {error && <p style={{ color: '#e74c3c', textAlign: 'center', marginBottom: '15px' }}>{error}</p>}
+
+      {/* Form เพิ่ม User */}
+      <form onSubmit={handleAdd} style={{ display: 'flex', gap: '10px', marginBottom: '20px', flexWrap: 'wrap', justifyContent: 'center' }}>
+        <input placeholder="Username" value={newUsername} onChange={e => setNewUsername(e.target.value)}
+          style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc', flex: '1 0 150px' }} />
+        <input placeholder="Password" type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)}
+          style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc', flex: '1 0 150px' }} />
+        <select value={newRole} onChange={e => setNewRole(e.target.value as 'admin' | 'user')}
+          style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }}>
           <option value="user">User</option>
           <option value="admin">Admin</option>
         </select>
-        <button type="submit" style={{ padding: '8px 15px', borderRadius: '5px', border: 'none', backgroundColor: '#28a745', color: 'white', cursor: 'pointer' }}>Add</button>
+        <button type="submit" style={{
+          padding: '8px 16px',
+          borderRadius: '6px',
+          border: 'none',
+          backgroundColor: '#27ae60',
+          color: '#fff',
+          fontWeight: 600,
+          cursor: 'pointer',
+        }}>เพิ่ม</button>
       </form>
 
-      <table style={{ width: '100%', borderCollapse: 'collapse', backgroundColor: 'white' }}>
+      {/* Table */}
+      <table style={{ width: '100%', borderCollapse: 'collapse', backgroundColor: '#fff' }}>
         <thead>
-          <tr style={{ backgroundColor: '#0070f3', color: 'white', textAlign: 'center', height: '45px' }}>
-            <th style={{ width: '10%', padding: '10px', borderRight: '1px solid #005bb5' }}>ID</th>
-            <th style={{ width: '40%', padding: '10px', borderRight: '1px solid #005bb5' }}>Username</th>
-            <th style={{ width: '20%', padding: '10px', borderRight: '1px solid #005bb5' }}>Role</th>
-            <th style={{ width: '30%', padding: '10px' }}>Actions</th>
+          <tr style={{ backgroundColor: '#f0e0d0', textAlign: 'center' }}>
+            <th style={{ padding: '10px', borderBottom: '1px solid #ccc' }}>ID</th>
+            <th style={{ padding: '10px', borderBottom: '1px solid #ccc' }}>Username</th>
+            <th style={{ padding: '10px', borderBottom: '1px solid #ccc' }}>Role</th>
+            <th style={{ padding: '10px', borderBottom: '1px solid #ccc' }}>จัดการ</th>
           </tr>
         </thead>
         <tbody>
           {users.map(u => (
-            <tr key={u.id} style={{ borderBottom: '1px solid #ddd', textAlign: 'center', height: '45px' }}>
-              <td>{u.id}</td>
-              <td>{editingId === u.id ? <input value={editUsername} onChange={e => setEditUsername(e.target.value)} style={{ padding: '5px', borderRadius: '4px', border: '1px solid #ccc', width: '90%' }} /> : u.username}</td>
-              <td>{editingId === u.id ? <select value={editRole} onChange={e => setEditRole(e.target.value as 'admin' | 'user')} style={{ padding: '5px', borderRadius: '4px', border: '1px solid #ccc', width: '90%' }}><option value="user">User</option><option value="admin">Admin</option></select> : u.role}</td>
-              <td>{editingId === u.id ? <>
-                <FaCheck onClick={() => handleSave(u.id)} style={{ cursor: 'pointer', marginRight: '10px', color: 'green' }} title="Save" />
-                <FaTimes onClick={handleCancel} style={{ cursor: 'pointer', color: 'red' }} title="Cancel" />
-              </> : <>
-                <FaEdit onClick={() => handleEdit(u)} style={{ cursor: 'pointer', marginRight: '10px', color: '#ffa500' }} title="Edit" />
-                <FaTrash onClick={() => handleDelete(u.id)} style={{ cursor: 'pointer', color: '#ff4d4f' }} title="Delete" />
-              </>}</td>
+            <tr key={u.id} style={{ textAlign: 'center', borderBottom: '1px solid #eee' }}>
+              <td style={{ padding: '10px' }}>{u.id}</td>
+              <td style={{ padding: '10px' }}>
+                {editingId === u.id
+                  ? <input value={editUsername} onChange={e => setEditUsername(e.target.value)}
+                      style={{ padding: '5px', borderRadius: '4px', border: '1px solid #ccc', width: '90%' }} />
+                  : u.username
+                }
+              </td>
+              <td style={{ padding: '10px' }}>
+                {editingId === u.id
+                  ? <select value={editRole} onChange={e => setEditRole(e.target.value as 'admin' | 'user')}
+                      style={{ padding: '5px', borderRadius: '4px', border: '1px solid #ccc', width: '90%' }}>
+                      <option value="user">User</option>
+                      <option value="admin">Admin</option>
+                    </select>
+                  : u.role
+                }
+              </td>
+              <td style={{ padding: '10px' }}>
+                <div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
+                  {editingId === u.id ? (
+                    <>
+                      <FaCheck onClick={() => handleSave(u.id)} style={{ cursor: 'pointer', color: '#27ae60' }} title="Save" />
+                      <FaTimes onClick={handleCancel} style={{ cursor: 'pointer', color: '#e74c3c' }} title="Cancel" />
+                    </>
+                  ) : (
+                    <>
+                      <FaEdit onClick={() => handleEdit(u)} style={{ cursor: 'pointer', color: '#2980b9' }} title="Edit" />
+                      <FaTrash onClick={() => handleDelete(u.id)} style={{ cursor: 'pointer', color: '#e74c3c' }} title="Delete" />
+                    </>
+                  )}
+                </div>
+              </td>
             </tr>
           ))}
         </tbody>

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import { FaCoffee } from 'react-icons/fa';
 
 export default function SignInPage() {
   const router = useRouter();
@@ -15,7 +16,7 @@ export default function SignInPage() {
     setError('');
 
     if (!username || !password) {
-      setError('กรุณากรอก username และ password');
+      setError('กรุณากรอก Username และ Password');
       return;
     }
 
@@ -26,86 +27,82 @@ export default function SignInPage() {
         redirect: false,
       });
 
-      if (res?.error) {
-        setError('Username หรือ Password ไม่ถูกต้อง');
-      } else if (res?.ok) {
-        window.location.href = '/';
-      }
+      if (res?.error) setError('ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง');
+      else if (res?.ok) window.location.href = '/';
     } catch (err) {
       console.error(err);
-      setError('เกิดข้อผิดพลาดในการ login');
+      setError('เกิดข้อผิดพลาดในการเข้าสู่ระบบ');
     }
   };
 
   return (
-    <div
+    <form 
+      onSubmit={handleSubmit}
       style={{
         display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        height: '100vh',
-        backgroundColor: '#f0f2f5',
+        flexDirection: 'column',
+        gap: '18px',
+        overflow: 'hidden',
       }}
     >
-      <form
-        onSubmit={handleSubmit}
+      {error && <p style={{ color: 'red', textAlign: 'center', fontSize: '14px' }}>{error}</p>}
+
+      <input
+        placeholder="ชื่อผู้ใช้"
+        value={username}
+        onChange={(e) => setUsername(e.target.value)}
         style={{
-          backgroundColor: 'white',
-          padding: '40px 30px',
-          borderRadius: '10px',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-          width: '100%',
-          maxWidth: '400px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '20px',
+          padding: '12px',
+          fontSize: '15px',
+          borderRadius: '6px',
+          border: '1px solid #ccc',
+          outline: 'none',
+          
         }}
+      />
+
+      <input
+        placeholder="รหัสผ่าน"
+        type="password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        style={{
+          padding: '12px',
+          fontSize: '15px',
+          borderRadius: '6px',
+          border: '1px solid #ccc',
+          outline: 'none',
+        }}
+      />
+
+      <button
+        type="submit"
+        style={{
+          padding: '12px',
+          fontSize: '16px',
+          borderRadius: '8px',
+          border: 'none',
+          backgroundColor: '#c77b30',
+          color: 'white',
+          fontWeight: 600,
+          cursor: 'pointer',
+          transition: '0.3s',
+        }}
+        onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#a86526')}
+        onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#c77b30')}
       >
-        <h2 style={{ textAlign: 'center', marginBottom: '10px', color: '#0070f3' }}>
-          Login
-        </h2>
+        เข้าสู่ระบบ
+      </button>
 
-        {error && <p style={{ color: 'red', textAlign: 'center', fontSize: '14px' }}>{error}</p>}
-
-        <input
-          placeholder="Username"
-          value={username}
-          onChange={e => setUsername(e.target.value)}
-          style={{ padding: '12px', fontSize: '16px', borderRadius: '6px', border: '1px solid #ccc' }}
-        />
-        <input
-          placeholder="Password"
-          type="password"
-          value={password}
-          onChange={e => setPassword(e.target.value)}
-          style={{ padding: '12px', fontSize: '16px', borderRadius: '6px', border: '1px solid #ccc' }}
-        />
-        <button
-          type="submit"
-          style={{
-            padding: '12px',
-            fontSize: '16px',
-            borderRadius: '6px',
-            border: 'none',
-            backgroundColor: '#0070f3',
-            color: 'white',
-            cursor: 'pointer',
-          }}
+      <p style={{ textAlign: 'center', marginTop: '10px', fontSize: '14px', color: '#5c4033' }}>
+        ยังไม่มีบัญชี?{' '}
+        <span
+          style={{ color: '#c77b30', cursor: 'pointer', textDecoration: 'underline' }}
+          onClick={() => router.push('/register')}
         >
-          Login
-        </button>
-
-        {/* ลิงก์ไปหน้า Register */}
-        <p style={{ textAlign: 'center', marginTop: '10px', fontSize: '14px' }}>
-          ยังไม่มีบัญชี?{' '}
-          <span
-            style={{ color: '#0070f3', cursor: 'pointer', textDecoration: 'underline' }}
-            onClick={() => router.push('/register')}
-          >
-            สมัครสมาชิก
-          </span>
-        </p>
-      </form>
-    </div>
+          สมัครสมาชิก
+        </span>
+      </p>
+    </form>
   );
 }
